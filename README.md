@@ -14,7 +14,7 @@ Hostname is changed by updating the `/etc/hostname` file:
 sudo nano /etc/hostname
 ```
 
-First RasPi is named as `kubmaster` and the other two `kubnode1` and `kubnode2` respectively.
+First RasPi (Control plane) is named as `kubmaster` and the other two (worker nodes) `kubnode1` and `kubnode2` respectively.
 
 ## Setting static IP-addresses
 
@@ -296,9 +296,6 @@ Although etcd ports are included in control-plane nodes, you can also host your 
 More information can be found in [Kubernetes website](https://v1-17.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-kubeadm-kubelet-and-kubectl).
 
 ```
-sudo apt update && sudo apt-get install -y apt-transport-https curl
-```
-```
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
 ```
 ```
@@ -313,7 +310,7 @@ sudo apt update
 sudo apt install -y kubelet kubeadm kubectl
 ```
 ```
-sudo apt hold kubelet kubeadm kubectl
+sudo apt-mark hold kubelet kubeadm kubectl
 ```
 
 
