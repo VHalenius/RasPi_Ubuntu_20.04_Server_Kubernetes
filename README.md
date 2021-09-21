@@ -64,12 +64,13 @@ sudo snap install kubectl --classic
 
 ## Installing container runtime
 
-Kubernetes supports three container runtimes: Docker, containerd and CRI-O. In this document, Docker will be used. More information can be found in [Docker website](https://docs.docker.com/engine/install/ubuntu/#prerequisites).
+Kubernetes supports three container runtimes: Docker, containerd and CRI-O. In this document, Docker will be used. More information can be found in [Docker website](https://docs.docker.com/engine/install/ubuntu/#prerequisites) and [Kubernetes website](https://kubernetes.io/docs/setup/production-environment/container-runtimes/).
 
 First task is to uninstall possible older Docker versions:
 ```
 sudo apt remove docker docker-engine docker.io containerd runc
 sudo apt update
+sudo apt upgrade
 ```
 
 ### Set up the repository:
@@ -101,6 +102,7 @@ sudo apt upgrade
 ```
 
 ### Install Docker engine:
+
 ```
 sudo apt install docker-ce docker-ce-cli containerd.io
 ```
@@ -140,6 +142,35 @@ For more examples and ideas, visit:
  https://docs.docker.com/get-started/
 ```
 
+### Configuring csgroup to use systemd:
+
+Next step is to configure csgroup to use systemd. More information can be found in [Kubernetes website](https://kubernetes.io/docs/setup/production-environment/container-runtimes/):
+
+Configure the Docker daemon, in particular to use systemd for the management of the container’s cgroups:
+
+```
+sudo mkdir /etc/docker
+```
+```
+cat <<EOF | sudo tee /etc/docker/daemon.json
+{
+  "exec-opts": ["native.cgroupdriver=systemd"],
+  "log-driver": "json-file",
+  "log-opts": {
+    "max-size": "100m"
+  },
+  "storage-driver": "overlay2"
+}
+EOF
+```
+
+### Restart Docker and enable on boot
+
+```
+sudo systemctl enable docker
+sudo systemctl daemon-reload
+sudo systemctl restart docker
+```
 
 
 
