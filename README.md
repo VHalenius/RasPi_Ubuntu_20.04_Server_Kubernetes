@@ -172,6 +172,34 @@ sudo systemctl daemon-reload
 sudo systemctl restart docker
 ```
 
+## Install kubeadm
+
+More information and pre-requisites can be found in [Kubernetes website](https://v1-17.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/).
+
+### Verify the MAC address and product_uuid are unique for every node
+
+Checking MAC addresses:
+```
+ip link
+```
+
+The second rows for each adapter shows MAC addresses. For example, for adapter `eth0` MAC address is `e4:5f:01:27:d0:23`:
+
+```
+1: lo: <LOOPBACK,UP,LOWER_UP> mtu 65536 qdisc noqueue state UNKNOWN mode DEFAULT group default qlen 1000
+    link/loopback 00:00:00:00:00:00 brd 00:00:00:00:00:00
+2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP mode DEFAULT group default qlen 1000
+    link/ether e4:5f:01:27:d0:23 brd ff:ff:ff:ff:ff:ff
+3: wlan0: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
+    link/ether e4:5f:01:27:d0:24 brd ff:ff:ff:ff:ff:ff
+4: docker0: <NO-CARRIER,BROADCAST,MULTICAST,UP> mtu 1500 qdisc noqueue state DOWN mode DEFAULT group default
+    link/ether 02:42:2e:88:56:35 brd ff:ff:ff:ff:ff:ff
+```
+
+Checking product_uuid:
+```
+sudo cat /etc/machine-id
+```
 
 
 
