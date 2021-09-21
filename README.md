@@ -1,4 +1,4 @@
-# Installing Kubernetes on Raspberry Pi running on Ubuntu Server 20.04 LTS
+# Installing Kubernetes cluster on Raspberry Pis running on Ubuntu Server 20.04 LTS
 
 This document describes how to install Kubernetes cluster on three Raspberry Pi 4B 8GB computers running Ubuntu Server 20.04 LTS. Ubuntu Server was installed using images written to SD cards using Raspberry Pi Imager.
 
