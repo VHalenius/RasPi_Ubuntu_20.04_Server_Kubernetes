@@ -2,6 +2,8 @@
 
 This document describes how to install Kubernetes cluster on three Raspberry Pi 4B 8GB computers running Ubuntu Server 20.04 LTS. Ubuntu Server was installed using images written to SD cards using Raspberry Pi Imager.
 
+Following steps are done in all nodes (Control plane(s) and worker nodes). Steps which are done only on some node types are mentioned specifically.
+
 ## Changing host name
 
 First step after starting up the Raspberry Pis was to change the hostname and set a static IP address.
