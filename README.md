@@ -395,12 +395,12 @@ Add following to the end of `/boot/firmware/cmdline.txt`:
 cgroup_enable=memory swapaccount=1 cgroup_memory=1 cgroup_enable=cpuset
 ```
 
+> NOTE: add it to the end of the existing text, not in a new line
+
 After updating `/boot/firmware/cmdline.txt` for all nodes, reboot the nodes:
 ```
 sudo shutdown -r 0
 ```
-
-> NOTE: add it to the end of the existing text, not in a new line
 
 ## Creating a single control-plane cluster with kubeadm
 
@@ -522,16 +522,33 @@ kubnode2    Ready    worker                 4m25s   v1.22.2
 
 >NOTE: Control plane only
 
-For automatically allocating disk space for persistent storage, a Persistent Storage provisioner is needed. In this document `local-path`provisioner from Rancher is used.
+For automatically allocating disk space for persistent storage, a Persistent Storage provisioner is needed. In this document `local-path` provisioner from Rancher is used. More information can be found in [Rancher Git](https://github.com/rancher/local-path-provisioner/blob/master/README.md#usage).
 
-### Installing the provisioner:
+Installing the provisioner:
 ```
 kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
 ```
 
-### Setting local-path provisioner as default:
+You should see the following:
+```
+namespace/local-path-storage created
+serviceaccount/local-path-provisioner-service-account created
+clusterrole.rbac.authorization.k8s.io/local-path-provisioner-role created
+clusterrolebinding.rbac.authorization.k8s.io/local-path-provisioner-bind created
+deployment.apps/local-path-provisioner created
+storageclass.storage.k8s.io/local-path created
+configmap/local-path-config created
+```
+
+
+Setting local-path provisioner as default:
 ```
 kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+```
+
+You should see the following:
+```
+storageclass.storage.k8s.io/local-path patched
 ```
 
 ## TODO
