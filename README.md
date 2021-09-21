@@ -320,6 +320,10 @@ Add following to the end of `/boot/firmware/cmdline.txt`:
 cgroup_enable=memory swapaccount=1 cgroup_memory=1 cgroup_enable=cpuset
 ```
 
+After updating `/boot/firmware/cmdline.txt` for all nodes, reboot the nodes:
+```
+sudo shutdown -r 0
+```
 
 > NOTE: add it to the end of the existing text, not in a new line
 
