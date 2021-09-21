@@ -393,7 +393,7 @@ kubectl apply -f calico.yaml
 
 > NOTE: worker nodes only
 
-Enter following commands in worker nodes:
+Enter following commands in worker nodes. Use the token which was given to you in step "Creating a single control-plane cluster with kubeadm":
 ```
 kubeadm join 192.168.0.230:6443 --token yh2ofi.2xx3bcs66xbc68f3 \
         --discovery-token-ca-cert-hash sha256:faf6a5ec00fb44d91d23ef4b55b414f1cfb37d892428b0b24cbae4129c9a300d
