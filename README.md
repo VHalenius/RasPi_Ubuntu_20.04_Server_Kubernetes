@@ -272,11 +272,58 @@ Information about required ports can be found in [Kubernetes website](https://v1
 
 |Protocol|Direction|Port Range|Purpose|Used By|
 |:---|:---|:---|:---|:---|
-|TCP|Inbound|6443*|Kubernetes|API server|All|
+|TCP|Inbound|6443*|Kubernetes API server|All|
 |TCP|Inbound|2379-2380|etcd server client API|kube-apiserver, etcd|
 |TCP|Inbound|10250|Kubelet API|Self, Control plane|
 |TCP|Inbound|10251|kube-scheduler|Self|
 |TCP|Inbound|10252|kube-controller-manager|Self|
+
+### Setting firewall rules for Control plane:
+
+Denying all incoming traffic by default
+```
+sudo ufw default deny incoming
+```
+
+Allow SSH:
+```
+sudo ufw allow 22 comment 'SSH'
+```
+
+Allow HTTP:
+```
+sudo ufw allow 80 comment 'HTTP'
+```
+
+Allow Kubernetes API server:
+```
+sudo ufw allow 6443/tcp comment 'Kubernetes API server'
+```
+
+Allow etcd server client API:
+```
+sudo ufw allow 2379:2380/tcp comment 'etcd server client API'
+```
+
+Allow Kubelet API:
+```
+sudo ufw allow 10250/tcp comment 'Kubelet API'
+```
+
+Allow kube-scheduler:
+```
+sudo ufw allow 10251/tcp comment 'kube-scheduler'
+```
+
+Allow kube-controller-manager:
+```
+sudo ufw allow 10252/tcp comment 'kube-controller-manager'
+```
+
+Enable firewall:
+```
+sudo ufw enable
+```
 
 ### Worker node(s):
 
@@ -290,6 +337,34 @@ Information about required ports can be found in [Kubernetes website](https://v1
 Any port numbers marked with * are overridable, so you will need to ensure any custom ports you provide are also open.
 
 Although etcd ports are included in control-plane nodes, you can also host your own etcd cluster externally or on custom ports.
+
+### Setting firewall rules for worker nodes:
+
+Denying all incoming traffic by default
+```
+sudo ufw default deny incoming
+```
+
+Allow SSH:
+```
+sudo ufw allow 22 comment 'SSH'
+```
+
+Allow Kubelet API:
+```
+sudo ufw allow 10250/tcp comment 'Kubelet API'
+````
+
+Allow NodePort:
+```
+sudo ufw allow 30000:32767/tcp comment 'NodePort'
+```
+
+Enable firewall:
+```
+sudo ufw enable
+```
+
 
 ## Installing kubeadm, kubelet and kubectl
 
