@@ -52,11 +52,6 @@ network:
           addresses: [192.168.0.200]
 ```
 
-Apply the changes:
-```
-sudo netplan apply
-```
-
 After the changes, reboot and ssh into each system.
 
 ## Setting correct time zone
