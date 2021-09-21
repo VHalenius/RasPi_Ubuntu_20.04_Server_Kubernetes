@@ -409,6 +409,39 @@ Enter following commands in worker nodes. Use the token which was given to you i
 sudo kubeadm join 192.168.0.230:6443 --token yh2ofi.2xx3bcs66xbc68f3 \
         --discovery-token-ca-cert-hash sha256:faf6a5ec00fb44d91d23ef4b55b414f1cfb37d892428b0b24cbae4129c9a300d
 ```
+You should see following information:
+
+```
+This node has joined the cluster:
+* Certificate signing request was sent to apiserver and a response was received.
+* The Kubelet was informed of the new secure connection details.
+
+Run 'kubectl get nodes' on the control-plane to see this node join the cluster.
+```
+
+When running `kubectl get nodes` in Control plan, you should see the following:
+```
+NAME        STATUS   ROLES                  AGE     VERSION
+kubmaster   Ready    control-plane,master   35m     v1.22.2
+kubnode1    Ready    <none>                 2m16s   v1.22.2
+kubnode2    Ready    <none>                 63s     v1.22.2
+```
+
+If you want to give more descriptive role to workers you can add labels in the Control plane node:
+```
+kubectl label node kubnode1 node-role.kubernetes.io/worker=worker
+```
+```
+kubectl label node kubnode2 node-role.kubernetes.io/worker=worker
+```
+
+Now when you enter `kubectl get nodes` in the Control plane node, you will get:
+```
+NAME        STATUS   ROLES                  AGE     VERSION
+kubmaster   Ready    control-plane,master   38m     v1.22.2
+kubnode1    Ready    worker                 5m38s   v1.22.2
+kubnode2    Ready    worker                 4m25s   v1.22.2
+```
 
 
 
