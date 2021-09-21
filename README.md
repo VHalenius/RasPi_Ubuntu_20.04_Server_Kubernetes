@@ -36,6 +36,8 @@ network:
           addresses: [192.168.0.200]
 ```
 
+After the changes, reboot and ssh into each system.
+
 ## Setting correct time zone
 
 Default system time zone is Etc/UTC, and I needed to change it to Europe/Helsinki:
@@ -53,4 +55,54 @@ Updating the packages should probably be done as a first step, but I'm running t
 sudo apt update
 sudo apt upgrade -y
 ```
+
+## Installing kubectl
+
+```
+sudo snap install kubectl --classic
+```
+
+## Installing container runtime
+
+Kubernetes supports three container runtimes: Docker, containerd and CRI-O. In this document, Docker will be used. More information can be found in [Docker website](https://docs.docker.com/engine/install/ubuntu/#prerequisites).
+
+First task is to uninstall possible older Docker versions:
+```
+sudo apt remove docker docker-engine docker.io containerd runc
+sudo apt update
+```
+
+### Set up the repository:
+```
+sudo apt install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg \
+    lsb-release
+```
+
+Add Docker’s official GPG key:
+```
+sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /usr/share/keyrings/docker-archive-keyring.gpg
+```
+
+Set up the stable repository:
+```
+echo \
+  "deb [arch=arm64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
+  $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+```
+
+Update packages
+```
+sudo apt update
+sudo apt upgrade
+```
+
+### Install Docker engine:
+```
+sudo apt install docker-ce docker-ce-cli containerd.io
+```
+
 
