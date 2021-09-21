@@ -389,7 +389,7 @@ kubmaster   Ready    control-plane,master   12m   v1.22.2
 ```
 
 
-## Install pod network
+## Installing pod network
 
 In this document Calico is used as pod network. Mode information can be found in [Calico website](https://docs.projectcalico.org/getting-started/kubernetes/self-managed-onprem/onpremises).
 
@@ -443,7 +443,7 @@ kubnode1    Ready    worker                 5m38s   v1.22.2
 kubnode2    Ready    worker                 4m25s   v1.22.2
 ```
 
-## Install local-path Persistent Storage provisioner
+## Installing local-path Persistent Storage provisioner
 
 >NOTE: Control plane only
 
@@ -459,6 +459,11 @@ kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisione
 kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
 ```
 
+## TODO
+
+Install MetalLB – Loadbalancer for bare-metal kubernetes clusters
+
+Install Helm to install kubernetes packages.
 
 
 
