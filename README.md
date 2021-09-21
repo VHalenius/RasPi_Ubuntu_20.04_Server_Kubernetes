@@ -168,14 +168,6 @@ EOF
 
 ```
 sudo systemctl enable docker
-```
-
-You should see following message:
-```
-Synchronizing state of docker.service with SysV service script with /lib/systemd/systemd-sysv-install.
-Executing: /lib/systemd/systemd-sysv-install enable docker
-```
-```
 sudo systemctl daemon-reload
 sudo systemctl restart docker
 ```
