@@ -443,6 +443,24 @@ kubnode1    Ready    worker                 5m38s   v1.22.2
 kubnode2    Ready    worker                 4m25s   v1.22.2
 ```
 
+## Install local-path Persistent Storage provisioner
+
+>NOTE: Control plane only
+
+For automatically allocating disk space for persistent storage, a Persistent Storage provisioner is needed. In this document `local-path`provisioner from Rancher is used.
+
+### Installing the provisioner:
+```
+kubectl apply -f https://raw.githubusercontent.com/rancher/local-path-provisioner/master/deploy/local-path-storage.yaml
+```
+
+### Setting local-path provisioner as default:
+```
+kubectl patch storageclass local-path -p '{"metadata": {"annotations":{"storageclass.kubernetes.io/is-default-class":"true"}}}'
+```
+
+
+
 
 
 
