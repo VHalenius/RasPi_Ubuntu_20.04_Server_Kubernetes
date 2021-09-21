@@ -53,7 +53,9 @@ Updating the packages should probably be done as a first step, but I'm running t
 
 ```
 sudo apt update
-sudo apt upgrade -y
+```
+```
+sudo apt upgrade
 ```
 
 ## Installing kubectl
@@ -69,7 +71,11 @@ Kubernetes supports three container runtimes: Docker, containerd and CRI-O. In t
 First task is to uninstall possible older Docker versions:
 ```
 sudo apt remove docker docker-engine docker.io containerd runc
+```
+```
 sudo apt update
+```
+```
 sudo apt upgrade
 ```
 
@@ -98,6 +104,8 @@ echo \
 Update packages
 ```
 sudo apt update
+```
+```
 sudo apt upgrade
 ```
 
@@ -168,7 +176,11 @@ EOF
 
 ```
 sudo systemctl enable docker
+```
+```
 sudo systemctl daemon-reload
+```
+```
 sudo systemctl restart docker
 ```
 
@@ -204,19 +216,57 @@ sudo cat /etc/machine-id
 ### Letting iptables see bridged traffic
 
 ```
-cat <<EOF > /etc/sysctl.d/k8s.conf
+cat <<EOF | sudo tee /etc/modules-load.d/k8s.conf
+br_netfilter
+EOF
+```
+
+
+```
+cat <<EOF | sudo tee /etc/sysctl.d/k8s.conf
 net.bridge.bridge-nf-call-ip6tables = 1
 net.bridge.bridge-nf-call-iptables = 1
 EOF
 ```
 ```
-sysctl --system
+sudo sysctl --system
 ```
 
 Make sure that the `br_netfilter` module is loaded before this step. This can be done by running:
 ```
-lsmod | grep br_netfilter
+sudo lsmod | grep br_netfilter
 ```
+
+You should see something like this:
+```
+br_netfilter           28672  0
+bridge                225280  1 br_netfilter
+```
+
+### Ensure iptables tooling does not use the nftables backend
+
+More information can be found in [Kubernetes website](https://v1-17.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#ensure-iptables-tooling-does-not-use-the-nftables-backend)
+
+
+Ensure legacy binaries are installed:
+```
+sudo apt-get install -y iptables arptables ebtables
+```
+
+Switch to legacy versions:
+```
+sudo update-alternatives --set iptables /usr/sbin/iptables-legacy
+```
+```
+sudo update-alternatives --set ip6tables /usr/sbin/ip6tables-legacy
+```
+```
+sudo update-alternatives --set arptables /usr/sbin/arptables-legacy
+```
+```
+sudo update-alternatives --set ebtables /usr/sbin/ebtables-legacy
+```
+
 
 
 
