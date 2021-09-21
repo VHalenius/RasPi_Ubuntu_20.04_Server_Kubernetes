@@ -294,7 +294,7 @@ Although etcd ports are included in control-plane nodes, you can also host your 
 More information can be found in [Kubernetes website](https://v1-17.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-kubeadm-kubelet-and-kubectl).
 
 ```
-sudo apt-get update && sudo apt-get install -y apt-transport-https curl
+sudo apt update && sudo apt-get install -y apt-transport-https curl
 ```
 ```
 curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
@@ -305,13 +305,13 @@ deb https://apt.kubernetes.io/ kubernetes-xenial main
 EOF
 ```
 ```
-sudo apt-get update
+sudo apt update
 ```
 ```
-sudo apt-get install -y kubelet kubeadm kubectl
+sudo apt install -y kubelet kubeadm kubectl
 ```
 ```
-sudo apt-mark hold kubelet kubeadm kubectl
+sudo apt hold kubelet kubeadm kubectl
 ```
 
 
