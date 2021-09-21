@@ -2,7 +2,21 @@
 
 This document describes how to install Kubernetes cluster on three Raspberry Pi 4B 8GB computers running Ubuntu Server 20.04 LTS. Ubuntu Server was installed using images written to SD cards using Raspberry Pi Imager.
 
-Following steps are done in all nodes (Control plane(s) and worker nodes). Steps which are done only on some node types are mentioned specifically.
+Following steps are done in all nodes (control-plane(s) and worker nodes). Steps which are done only on some node types are mentioned specifically.
+
+* [Changing host name](#changing-host-name)
+* [Setting static IP-addresses](#setting-static-ip-addresses)
+* [Setting correct time zone](#setting-correct-time-zone)
+* [Updating packages](#updating-packages)
+* [Installing container runtime](#installing-container-runtime)
+* [Check pre-requisites](#check-pre-requisites)
+* [Check required ports](#check-required-ports)
+* [Installing kubeadm, kubelet and kubectl](#installing-kubeadm-kubelet-and-kubectl)
+* [Creating a single control-plane cluster with kubeadm](#creating-a-single-control-plane-cluster-with-kubeadm)
+* [Installing pod network](#installing-pod-network)
+* [Join worker nodes](#join-worker-nodes)
+* [Installing local-path Persistent Storage provisioner](#installing-local-path-persistent-storage-provisioner)
+
 
 ## Changing host name
 
@@ -181,9 +195,9 @@ sudo systemctl daemon-reload
 sudo systemctl restart docker
 ```
 
-## Install kubeadm
+## Check pre-requisites
 
-More information and pre-requisites can be found in [Kubernetes website](https://v1-17.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/).
+More information about pre-requisites can be found in [Kubernetes website](https://v1-17.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/).
 
 ### Verify the MAC address and product_uuid are unique for every node
 
@@ -262,6 +276,20 @@ sudo update-alternatives --set arptables /usr/sbin/arptables-legacy
 ```
 ```
 sudo update-alternatives --set ebtables /usr/sbin/ebtables-legacy
+```
+
+### Enable cgroups
+
+Add following to the end of `/boot/firmware/cmdline.txt`:
+```
+cgroup_enable=memory swapaccount=1 cgroup_memory=1 cgroup_enable=cpuset
+```
+
+> NOTE: add it to the end of the existing text, not in a new line
+
+After updating `/boot/firmware/cmdline.txt` for all nodes, reboot the nodes:
+```
+sudo shutdown -r 0
 ```
 
 ## Check required ports
@@ -388,19 +416,7 @@ sudo apt install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
 ```
 
-## Enable cgroups
 
-Add following to the end of `/boot/firmware/cmdline.txt`:
-```
-cgroup_enable=memory swapaccount=1 cgroup_memory=1 cgroup_enable=cpuset
-```
-
-> NOTE: add it to the end of the existing text, not in a new line
-
-After updating `/boot/firmware/cmdline.txt` for all nodes, reboot the nodes:
-```
-sudo shutdown -r 0
-```
 
 ## Creating a single control-plane cluster with kubeadm
 
@@ -553,9 +569,9 @@ storageclass.storage.k8s.io/local-path patched
 
 ## TODO
 
-Install MetalLB – Loadbalancer for bare-metal kubernetes clusters
+Install MetalLB – Loadbalancer for bare-metal kubernetes clusters https://metallb.universe.tf/
 
-Install Helm to install kubernetes packages.
+Install Helm to install kubernetes packages. https://helm.sh/
 
 
 
