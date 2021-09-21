@@ -147,7 +147,7 @@ For more examples and ideas, visit:
  https://docs.docker.com/get-started/
 ```
 
-### Configuring csgroup to use systemd:
+### Configuring cgroup to use systemd:
 
 Next step is to configure csgroup to use systemd. More information can be found in [Kubernetes website](https://kubernetes.io/docs/setup/production-environment/container-runtimes/):
 
@@ -313,17 +313,94 @@ sudo apt install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
 ```
 
+## Enable cgroups
+
+Add following to the end of `/boot/firmware/cmdline.txt`:
+```
+cgroup_enable=memory swapaccount=1 cgroup_memory=1 cgroup_enable=cpuset
+```
+
+
+> NOTE: add it to the end of the existing text, not in a new line
+
 ## Creating a single control-plane cluster with kubeadm
 
 > NOTE: Control plane only!
 
 More information can be found in [Kubernetes website](https://v1-17.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/).
 
-Control plane is initialized using `kubeadm init`. It is important to specify `--apiserver-advertise-address` and `--pod-network-cidr`. Apiserver advertise address is used to set the advertise address for this particular control-plane node’s API server. Pod network cidr specifies the network in which pods are created. In my case I'm using Control plane's (`kubmaster`) IP-address as apiserver address, and `10.0.0.0/8` as pod network cidr:
+Control plane is initialized using `kubeadm init`. Apiserver advertise address is used to set the advertise address for this particular control-plane node’s API server. Pod network cidr specifies the network in which pods are created. In my case I'm using Control plane's (`kubmaster`) IP-address as apiserver address, and `10.0.0.0/8` as pod network cidr:
 
 ```
 sudo kubeadm init --apiserver-advertise-address=192.168.0.230 --pod-network-cidr=10.0.0.0/8
 ```
+
+You should see following text indicating that the installation was successful. Note the commands to run for starting to use the cluster, as well as the command to join the nodes:
+```
+Your Kubernetes control-plane has initialized successfully!
+
+To start using your cluster, you need to run the following as a regular user:
+
+  mkdir -p $HOME/.kube
+  sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+  sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+Alternatively, if you are the root user, you can run:
+
+  export KUBECONFIG=/etc/kubernetes/admin.conf
+
+You should now deploy a pod network to the cluster.
+Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
+  https://kubernetes.io/docs/concepts/cluster-administration/addons/
+
+Then you can join any number of worker nodes by running the following on each as root:
+
+kubeadm join 192.168.0.230:6443 --token yh2ofi.2xx3bcs66xbc68f3 \
+        --discovery-token-ca-cert-hash sha256:faf6a5ec00fb44d91d23ef4b55b414f1cfb37d892428b0b24cbae4129c9a300d
+```
+
+
+### Connect kubectl to cluster:
+
+```
+mkdir -p $HOME/.kube
+```
+```
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+```
+```
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+```
+
+### Test kubectl:
+
+```
+kubectl get nodes
+```
+
+## Install pod network
+
+In this document Calico is used as pod network. Mode information can be found in [Calico website](https://docs.projectcalico.org/getting-started/kubernetes/self-managed-onprem/onpremises).
+
+```
+curl https://docs.projectcalico.org/manifests/calico.yaml -O
+```
+```
+kubectl apply -f calico.yaml
+```
+
+## Join worker nodes
+
+> NOTE: worker nodes only
+
+Enter following commands in worker nodes:
+```
+kubeadm join 192.168.0.230:6443 --token yh2ofi.2xx3bcs66xbc68f3 \
+        --discovery-token-ca-cert-hash sha256:faf6a5ec00fb44d91d23ef4b55b414f1cfb37d892428b0b24cbae4129c9a300d
+```
+
+
+
 
 
 
