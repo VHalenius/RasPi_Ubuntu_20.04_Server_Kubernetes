@@ -58,11 +58,6 @@ sudo apt update
 sudo apt upgrade
 ```
 
-## Installing kubectl
-
-```
-sudo snap install kubectl --classic
-```
 
 ## Installing container runtime
 
@@ -266,6 +261,61 @@ sudo update-alternatives --set arptables /usr/sbin/arptables-legacy
 ```
 sudo update-alternatives --set ebtables /usr/sbin/ebtables-legacy
 ```
+
+## Check required ports
+
+Information about required ports can be found in [Kubernetes website](https://v1-17.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#check-required-ports).
+
+### Control plane nodes:
+
+|Protocol|Direction|Port Range|Purpose|Used By|
+|:---|:---|:---|:---|:---|
+|TCP|Inbound|6443*|Kubernetes|API server|All|
+|TCP|Inbound|2379-2380|etcd server client API|kube-apiserver, etcd|
+|TCP|Inbound|10250|Kubelet API|Self, Control plane|
+|TCP|Inbound|10251|kube-scheduler|Self|
+|TCP|Inbound|10252|kube-controller-manager|Self|
+
+### Worker node(s):
+
+|Protocol|Direction|Port Range|Purpose|Used By|
+|:---|:---|:---|:---|:---|
+|TCP|Inbound|10250|Kubelet API|Self, Control plane|
+|TCP|Inbound|30000-32767|NodePort|Services†	All|
+
+† Default port range for [NodePort Services](https://v1-17.docs.kubernetes.io/docs/concepts/services-networking/service/).
+
+Any port numbers marked with * are overridable, so you will need to ensure any custom ports you provide are also open.
+
+Although etcd ports are included in control-plane nodes, you can also host your own etcd cluster externally or on custom ports.
+
+## Installing kubeadm, kubelet and kubectl
+
+More information can be found in [Kubernetes website](https://v1-17.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#installing-kubeadm-kubelet-and-kubectl).
+
+```
+sudo apt-get update && sudo apt-get install -y apt-transport-https curl
+```
+```
+curl -s https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
+```
+```
+cat <<EOF | sudo tee /etc/apt/sources.list.d/kubernetes.list
+deb https://apt.kubernetes.io/ kubernetes-xenial main
+EOF
+```
+```
+sudo apt-get update
+```
+```
+sudo apt-get install -y kubelet kubeadm kubectl
+```
+```
+sudo apt-mark hold kubelet kubeadm kubectl
+```
+
+
+
 
 
 
