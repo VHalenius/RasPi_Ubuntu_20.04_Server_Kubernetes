@@ -201,5 +201,22 @@ Checking product_uuid:
 sudo cat /etc/machine-id
 ```
 
+### Letting iptables see bridged traffic
+
+```
+cat <<EOF > /etc/sysctl.d/k8s.conf
+net.bridge.bridge-nf-call-ip6tables = 1
+net.bridge.bridge-nf-call-iptables = 1
+EOF
+```
+```
+sysctl --system
+```
+
+Make sure that the `br_netfilter` module is loaded before this step. This can be done by running:
+```
+lsmod | grep br_netfilter
+```
+
 
 
