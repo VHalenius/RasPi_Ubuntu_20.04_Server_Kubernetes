@@ -313,6 +313,17 @@ sudo apt install -y kubelet kubeadm kubectl
 sudo apt-mark hold kubelet kubeadm kubectl
 ```
 
+## Creating a single control-plane cluster with kubeadm
+
+> NOTE: Control plane only!
+
+More information can be found in [Kubernetes website](https://v1-17.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/create-cluster-kubeadm/).
+
+Control plane is initialized using `kubeadm init`. It is important to specify `--apiserver-advertise-address` and `--pod-network-cidr`. Apiserver advertise address is used to set the advertise address for this particular control-plane node’s API server. Pod network cidr specifies the network in which pods are created. In my case I'm using Control plane's (`kubmaster`) IP-address as apiserver address, and `10.0.0.0/8` as pod network cidr:
+
+```
+sudo kubeadm init --apiserver-advertise-address=192.168.0.230 --pod-network-cidr=10.0.0.0/8
+```
 
 
 
