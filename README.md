@@ -378,6 +378,13 @@ sudo chown $(id -u):$(id -g) $HOME/.kube/config
 kubectl get nodes
 ```
 
+It might take a while, but you should see the following:
+```
+NAME        STATUS   ROLES                  AGE   VERSION
+kubmaster   Ready    control-plane,master   12m   v1.22.2
+```
+
+
 ## Install pod network
 
 In this document Calico is used as pod network. Mode information can be found in [Calico website](https://docs.projectcalico.org/getting-started/kubernetes/self-managed-onprem/onpremises).
