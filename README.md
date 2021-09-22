@@ -16,6 +16,7 @@ Following steps are done in all nodes (control-plane(s) and worker nodes). Steps
 * [Installing pod network](#installing-pod-network)
 * [Join worker nodes](#join-worker-nodes)
 * [Installing local-path Persistent Storage provisioner](#installing-local-path-persistent-storage-provisioner)
+* [Installing MetalLB load balancer](#installing-metallb-load-balancer)
 
 
 ## Changing host name
@@ -566,6 +567,106 @@ You should see the following:
 ```
 storageclass.storage.k8s.io/local-path patched
 ```
+
+## Installing MetalLB load balancer
+
+To first see what is going to change:
+```
+# see what changes would be made, returns nonzero returncode if different
+kubectl get configmap kube-proxy -n kube-system -o yaml | \
+sed -e "s/strictARP: false/strictARP: true/" | \
+kubectl diff -f - -n kube-system
+```
+
+You should see the coming changes:
+```
+diff -u -N /tmp/LIVE-591024759/v1.ConfigMap.kube-system.kube-proxy /tmp/MERGED-191328618/v1.ConfigMap.kube-system.kube-proxy
+--- /tmp/LIVE-591024759/v1.ConfigMap.kube-system.kube-proxy     2021-09-22 09:48:22.281597871 +0300
++++ /tmp/MERGED-191328618/v1.ConfigMap.kube-system.kube-proxy   2021-09-22 09:48:22.285597809 +0300
+@@ -30,7 +30,7 @@
+       excludeCIDRs: null
+       minSyncPeriod: 0s
+       scheduler: ""
+-      strictARP: false
++      strictARP: true
+       syncPeriod: 0s
+       tcpFinTimeout: 0s
+       tcpTimeout: 0s
+@@ -79,7 +79,6 @@
+     fieldsV1:
+       f:data:
+         .: {}
+-        f:config.conf: {}
+         f:kubeconfig.conf: {}
+       f:metadata:
+         f:annotations:
+@@ -91,6 +90,14 @@
+     manager: kubeadm
+     operation: Update
+     time: "2021-09-21T15:34:22Z"
++  - apiVersion: v1
++    fieldsType: FieldsV1
++    fieldsV1:
++      f:data:
++        f:config.conf: {}
++    manager: kubectl-client-side-apply
++    operation: Update
++    time: "2021-09-22T06:48:22Z"
+   name: kube-proxy
+   namespace: kube-system
+   resourceVersion: "291"
+```
+
+Applying the changes:
+```
+# actually apply the changes, returns nonzero returncode on errors only
+kubectl get configmap kube-proxy -n kube-system -o yaml | \
+sed -e "s/strictARP: false/strictARP: true/" | \
+kubectl apply -f - -n kube-system
+```
+
+You should see the following:
+```
+Warning: resource configmaps/kube-proxy is missing the kubectl.kubernetes.io/last-applied-configuration annotation which is required by kubectl apply. kubectl apply should only be used on resources created declaratively by either kubectl create --save-config or kubectl apply. The missing annotation will be patched automatically.
+configmap/kube-proxy configured
+```
+
+To install MetalLB, apply the manifest. First one creates a namespace for MetlLB:
+```
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/namespace.yaml
+```
+
+You should see:
+```
+namespace/metallb-system created
+```
+
+To install the load balancer:
+```
+kubectl apply -f https://raw.githubusercontent.com/metallb/metallb/v0.10.2/manifests/metallb.yaml
+```
+
+You should see:
+```
+Warning: policy/v1beta1 PodSecurityPolicy is deprecated in v1.21+, unavailable in v1.25+
+podsecuritypolicy.policy/controller created
+podsecuritypolicy.policy/speaker created
+serviceaccount/controller created
+serviceaccount/speaker created
+clusterrole.rbac.authorization.k8s.io/metallb-system:controller created
+clusterrole.rbac.authorization.k8s.io/metallb-system:speaker created
+role.rbac.authorization.k8s.io/config-watcher created
+role.rbac.authorization.k8s.io/pod-lister created
+role.rbac.authorization.k8s.io/controller created
+clusterrolebinding.rbac.authorization.k8s.io/metallb-system:controller created
+clusterrolebinding.rbac.authorization.k8s.io/metallb-system:speaker created
+rolebinding.rbac.authorization.k8s.io/config-watcher created
+rolebinding.rbac.authorization.k8s.io/pod-lister created
+rolebinding.rbac.authorization.k8s.io/controller created
+daemonset.apps/speaker created
+deployment.apps/controller created
+```
+
 
 ## TODO
 
