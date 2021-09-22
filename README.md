@@ -570,66 +570,25 @@ storageclass.storage.k8s.io/local-path patched
 
 ## Installing MetalLB load balancer
 
-To first see what is going to change:
+More information can be found in [MetalLB website](https://metallb.universe.tf/installation/). Youtube channel "Just me and Opencource" has a great [video](https://www.youtube.com/watch?v=2SmYjj-GFnE) on installing and configuring MetalLB. 
+
+### Firewall rules
+
+Allow traffic (TCP and UDP) between nodes. Apply firewille rule to all nodes (Control plane(s) and workers):
 ```
-# see what changes would be made, returns nonzero returncode if different
-kubectl get configmap kube-proxy -n kube-system -o yaml | \
-sed -e "s/strictARP: false/strictARP: true/" | \
-kubectl diff -f - -n kube-system
+sudo ufw allow 7946 comment 'MetalLB'
 ```
 
-You should see the coming changes:
+### Check kube-proxy mode
+
+To see if kube-proxy is running on IPVS mode:
 ```
-diff -u -N /tmp/LIVE-591024759/v1.ConfigMap.kube-system.kube-proxy /tmp/MERGED-191328618/v1.ConfigMap.kube-system.kube-proxy
---- /tmp/LIVE-591024759/v1.ConfigMap.kube-system.kube-proxy     2021-09-22 09:48:22.281597871 +0300
-+++ /tmp/MERGED-191328618/v1.ConfigMap.kube-system.kube-proxy   2021-09-22 09:48:22.285597809 +0300
-@@ -30,7 +30,7 @@
-       excludeCIDRs: null
-       minSyncPeriod: 0s
-       scheduler: ""
--      strictARP: false
-+      strictARP: true
-       syncPeriod: 0s
-       tcpFinTimeout: 0s
-       tcpTimeout: 0s
-@@ -79,7 +79,6 @@
-     fieldsV1:
-       f:data:
-         .: {}
--        f:config.conf: {}
-         f:kubeconfig.conf: {}
-       f:metadata:
-         f:annotations:
-@@ -91,6 +90,14 @@
-     manager: kubeadm
-     operation: Update
-     time: "2021-09-21T15:34:22Z"
-+  - apiVersion: v1
-+    fieldsType: FieldsV1
-+    fieldsV1:
-+      f:data:
-+        f:config.conf: {}
-+    manager: kubectl-client-side-apply
-+    operation: Update
-+    time: "2021-09-22T06:48:22Z"
-   name: kube-proxy
-   namespace: kube-system
-   resourceVersion: "291"
+kubectl -n kube-system describe cm kube-proxy | grep mode
 ```
 
-Applying the changes:
-```
-# actually apply the changes, returns nonzero returncode on errors only
-kubectl get configmap kube-proxy -n kube-system -o yaml | \
-sed -e "s/strictARP: false/strictARP: true/" | \
-kubectl apply -f - -n kube-system
-```
+If you see `mode: ""` then kube-broxy is not running on IPVS-mode, and strict ARP mode does not need to be enabled. In other cases, check the [Preparation](https://metallb.universe.tf/installation/#preparation) section in MetalLB website.
 
-You should see the following:
-```
-Warning: resource configmaps/kube-proxy is missing the kubectl.kubernetes.io/last-applied-configuration annotation which is required by kubectl apply. kubectl apply should only be used on resources created declaratively by either kubectl create --save-config or kubectl apply. The missing annotation will be patched automatically.
-configmap/kube-proxy configured
-```
+### Installing MetalLB
 
 To install MetalLB, apply the manifest. First one creates a namespace for MetlLB:
 ```
@@ -665,6 +624,31 @@ rolebinding.rbac.authorization.k8s.io/pod-lister created
 rolebinding.rbac.authorization.k8s.io/controller created
 daemonset.apps/speaker created
 deployment.apps/controller created
+```
+
+### Configuration
+
+I am using Layer 2 configuration i.e. using a specific IP address range for load balacer to give out addresses to services. You can check more about [configuration options](https://metallb.universe.tf/configuration/#layer-2-configuration) in MetalLB website.
+
+First, create a temporary config-file, for example `temp.yaml` in your home directory. Then paste the configuration in the file, and change the `addresses:` -section to match the address range you want to use. I'm using ten addresses `192.168.0.240-192.168.0.249` in my subnet.
+```
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  namespace: metallb-system
+  name: config
+data:
+  config: |
+    address-pools:
+    - name: default
+      protocol: layer2
+      addresses:
+      - 192.168.0.240-192.168.0.249
+```
+
+Then apply the configuration:
+```
+kubectl create -f temp.yaml
 ```
 
 
