@@ -17,6 +17,7 @@ Following steps are done in all nodes (control-plane(s) and worker nodes). Steps
 * [Join worker nodes](#join-worker-nodes)
 * [Installing local-path Persistent Storage provisioner](#installing-local-path-persistent-storage-provisioner)
 * [Installing MetalLB load balancer](#installing-metallb-load-balancer)
+* [Installing Helm](#installing-helm)
 
 
 ## Changing host name
@@ -293,7 +294,7 @@ After updating `/boot/firmware/cmdline.txt` for all nodes, reboot the nodes:
 sudo shutdown -r 0
 ```
 
-## Check required ports
+## Firewall rules
 
 Information about required ports can be found in [Kubernetes website](https://v1-17.docs.kubernetes.io/docs/setup/production-environment/tools/kubeadm/install-kubeadm/#check-required-ports).
 
@@ -309,7 +310,7 @@ Information about required ports can be found in [Kubernetes website](https://v1
 
 ### Setting firewall rules for Control plane:
 
-Denying all incoming traffic by default
+Since this is a new install, and firewall is not enabled yet, all incoming traffic is set to denied by default, and allowen on case-by-case basis:
 ```
 sudo ufw default deny incoming
 ```
@@ -569,6 +570,7 @@ storageclass.storage.k8s.io/local-path patched
 ```
 
 ## Installing MetalLB load balancer
+>NOTE: Control plane only
 
 More information can be found in [MetalLB website](https://metallb.universe.tf/installation/). Youtube channel "Just me and Opencource" has a great [video](https://www.youtube.com/watch?v=2SmYjj-GFnE) on installing and configuring MetalLB. 
 
@@ -649,6 +651,30 @@ data:
 Then apply the configuration:
 ```
 kubectl create -f temp.yaml
+```
+
+## Installing Helm
+
+>NOTE: Control plane only
+
+```
+curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
+```
+
+```
+sudo apt-get install apt-transport-https --yes
+```
+
+```
+echo "deb https://baltocdn.com/helm/stable/debian/ all main" | sudo tee /etc/apt/sources.list.d/helm-stable-debian.list
+```
+
+```
+sudo apt-get update
+```
+
+```
+sudo apt-get install helm
 ```
 
 
