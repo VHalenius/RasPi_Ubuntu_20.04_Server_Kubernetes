@@ -657,6 +657,8 @@ kubectl create -f temp.yaml
 
 >NOTE: Control plane only
 
+More information can be found in [Helm website](https://helm.sh/docs/intro/install/)
+
 ```
 curl https://baltocdn.com/helm/signing.asc | sudo apt-key add -
 ```
