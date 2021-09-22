@@ -688,94 +688,14 @@ Install Helm to install kubernetes packages. https://helm.sh/
 
 
 
-## Installing NFS
-
-```
-sudo ufw allow 2049 comment 'NFS'
-```
-
-```
-sudo ufw allow 111 comment 'NFS'
-```
-
-```
-sudo apt install rpcbind nfs-kernel-server
-```
-
-```
-sudo mkdir -p /srv/nfs/storage
-```
-
-```
-sudo chown -R 777 /srv/nfs/storage
-```
-
-```
-sudo nano /etc/exports
-```
-
-Add line:
-```
-/srv/nfs/storage *(rw,sync,no_root_squash,no_subtree_check,no_all_squash,insecure)
-```
-
-Export configuration:
-```
-sudo exportfs -ra
-```
-
-Restart NFS service:
-```
-sudo service nfs-kernel-server restart
-```
-
-### Clients (worker nodes)
-
-```
-sudo apt update
-sudo apt-get install rpcbind nfs-common
-```
-
-```
-sudo nano /etc/hosts.deny
-```
-
-Add line:
-```
-rpcbind : ALL
-```
-
-```
-sudo nano /etc/hosts.allow
-```
-
-Add line:
-```
-rpcbind :  YOUR_NFS_SERVER_IP_ADDRESS_HERE
-```
-### NFS server configuration
-
-Enable NFS server:
-```
-sudo systemctl enable nfs-kernel-server
-```
-
-Restart NFS server:
-```
-sudo systemctl restart nfs-kernel-server
-```
-
-### Mount directory
-
-Create mount point in clients:
-```
-sudo mkdir /mnt/
-```
-
 
 ## NFS (another version)
 
 Useful [Youtube video](https://www.youtube.com/watch?v=DF3v2P8ENEg)  from "Just me and Opensource"
+
+```
+sudo apt install rpcbind nfs-kernel-server
+```
 
 ```
 sudo mkdir -p /srv/nfs/kubedata
@@ -806,10 +726,57 @@ sudo exportfs -rav
 sudo showmount -e localhost
 ```
 
+### Clients (worker nodes)
+
+```
+sudo apt update
+sudo apt-get install rpcbind nfs-common
+```
+
+```
+sudo nano /etc/hosts.deny
+```
+
+Add line:
+```
+rpcbind : ALL
+```
+
+```
+sudo nano /etc/hosts.allow
+```
+
+Add line:
+```
+rpcbind :  YOUR_NFS_SERVER_IP_ADDRESS_HERE
+# In my case
+rpcbind : 192.168.0.230
+```
+
+### Install the NFS client provisioner
+
 Download yaml files from:
 ```
 https://github.com/justmeandopensource/kubernetes/tree/master/yamls/nfs-provisioner
 ```
+
+Change `deployment.yaml` file, and update NFS server IP address, and change image pointing to arm-version:
+```
+image.repository=quay.io/external_storage/nfs-client-provisioner-arm
+```
+
+```
+kubectl create -f default-sc.yaml
+```
+
+```
+kubectl create -f rbac.yaml
+```
+
+```
+kubectl create -f deployment.yaml
+```
+
 
 
 
