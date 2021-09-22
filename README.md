@@ -817,7 +817,7 @@ sudo apt update
 sudo apt install helm
 ```
 
-### Plex Media Server
+## Plex Media Server
 
 Use `values.yaml` from this git repo. Change plex claim [token](https://plex.tv/claim)
 ```
