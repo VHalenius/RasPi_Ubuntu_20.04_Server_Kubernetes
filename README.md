@@ -574,6 +574,14 @@ storageclass.storage.k8s.io/local-path patched
 Useful [Youtube video](https://www.youtube.com/watch?v=DF3v2P8ENEg)  from "Just me and Opensource"
 
 ```
+sudo ufw allow 2049 comment 'NFS'
+```
+
+```
+sudo ufw allow 111 comment 'NFS'
+```
+
+```
 sudo apt install rpcbind nfs-kernel-server
 ```
 
@@ -609,6 +617,14 @@ sudo showmount -e localhost
 ### Clients (worker nodes)
 
 ```
+sudo ufw allow 2049 comment 'NFS'
+```
+
+```
+sudo ufw allow 111 comment 'NFS'
+```
+
+```
 sudo apt update
 sudo apt-get install rpcbind nfs-common
 ```
@@ -634,6 +650,8 @@ rpcbind : 192.168.0.230
 ```
 
 ### Install the NFS client provisioner
+
+>NOTE: Control plane only
 
 Download yaml files from:
 ```
@@ -740,6 +758,25 @@ Then apply the configuration:
 ```
 kubectl create -f temp.yaml
 ```
+
+You can test to see if the load balancer works by installing nginx, and creating a load balancer service for it:
+```
+kubectl create deploy nginx --image nginx
+```
+
+Service should have received an external IP address from the range you specified:
+```
+NAME         TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)        AGE
+kubernetes   ClusterIP      10.96.0.1      <none>          443/TCP        42m
+nginx        LoadBalancer   10.109.1.154   192.168.0.240   80:31728/TCP   3m46s
+```
+
+
+Creating the load balancer service:
+```
+kubectl expose deploy nginx --port 80 --type LoadBalancer
+```
+
 
 ## Installing Helm
 
