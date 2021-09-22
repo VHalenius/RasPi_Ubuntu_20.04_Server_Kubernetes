@@ -764,6 +764,11 @@ You can test to see if the load balancer works by installing nginx, and creating
 kubectl create deploy nginx --image nginx
 ```
 
+Creating the load balancer service:
+```
+kubectl expose deploy nginx --port 80 --type LoadBalancer
+```
+
 Service should have received an external IP address from the range you specified:
 ```
 NAME         TYPE           CLUSTER-IP     EXTERNAL-IP     PORT(S)        AGE
@@ -772,10 +777,7 @@ nginx        LoadBalancer   10.109.1.154   192.168.0.240   80:31728/TCP   3m46s
 ```
 
 
-Creating the load balancer service:
-```
-kubectl expose deploy nginx --port 80 --type LoadBalancer
-```
+
 
 
 ## Installing Helm
