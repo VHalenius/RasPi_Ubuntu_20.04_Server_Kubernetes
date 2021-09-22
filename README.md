@@ -452,8 +452,8 @@ Run "kubectl apply -f [podnetwork].yaml" with one of the options listed at:
 
 Then you can join any number of worker nodes by running the following on each as root:
 
-kubeadm join 192.168.0.230:6443 --token yh2ofi.2xx3bcs66xbc68f3 \
-        --discovery-token-ca-cert-hash sha256:faf6a5ec00fb44d91d23ef4b55b414f1cfb37d892428b0b24cbae4129c9a300d
+kubeadm join 192.168.0.230:6443 --token qp324u.5spbiugteb7i7iyr \
+        --discovery-token-ca-cert-hash sha256:b708db7f05ec100fa7049e562909944fa9a6aefb563e4cf5b1aae6aff3cb3bb3
 ```
 
 
@@ -755,13 +755,61 @@ rpcbind :  YOUR_NFS_SERVER_IP_ADDRESS_HERE
 ```
 ### NFS server configuration
 
+Enable NFS server:
 ```
 sudo systemctl enable nfs-kernel-server
 ```
 
+Restart NFS server:
+```
+sudo systemctl restart nfs-kernel-server
+```
+
+### Mount directory
+
+Create mount point in clients:
+```
+sudo mkdir /mnt/
+```
 
 
+## NFS (another version)
 
+Useful [Youtube video](https://www.youtube.com/watch?v=DF3v2P8ENEg)  from "Just me and Opensource"
+
+``
+sudo mkdir -p /srv/nfs/kubedata
+```
+
+```
+sudo chown nobody: /srv/nfs/kubedata
+```
+
+```
+sudo nano /etc/exports
+```
+
+Add row:
+```
+/srv/nfs/kubedata *(rw,sync,no_root_squash,no_subtree_check,no_all_squash,insecure)
+```
+
+```
+sudo systemctl enable --now nfs-server
+```
+
+```
+sudo exportfs -rav
+```
+
+```
+sudo showmount -e localhost
+```
+
+Download yaml files from:
+```
+https://github.com/justmeandopensource/kubernetes/tree/master/yamls/nfs-provisioner
+```
 
 
 
