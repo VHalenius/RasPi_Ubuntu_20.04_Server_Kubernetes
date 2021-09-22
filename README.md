@@ -10,7 +10,7 @@ Following steps are done in all nodes (control-plane(s) and worker nodes). Steps
 * [Updating packages](#updating-packages)
 * [Installing container runtime](#installing-container-runtime)
 * [Check pre-requisites](#check-pre-requisites)
-* [Check required ports](#check-required-ports)
+* [Firewall rules](#firewall-rules)
 * [Installing kubeadm, kubelet and kubectl](#installing-kubeadm-kubelet-and-kubectl)
 * [Creating a single control-plane cluster with kubeadm](#creating-a-single-control-plane-cluster-with-kubeadm)
 * [Installing pod network](#installing-pod-network)
