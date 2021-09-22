@@ -653,6 +653,17 @@ rpcbind : 192.168.0.230
 
 >NOTE: Control plane only
 
+```
+helm repo add nfs-subdir-external-provisioner https://kubernetes-sigs.github.io/nfs-subdir-external-provisioner/
+```
+```
+helm install nfs-subdir-external-provisioner nfs-subdir-external-provisioner/nfs-subdir-external-provisioner \
+    --set nfs.server=x.x.x.x \
+    --set nfs.path=/exported/path
+```
+
+>NOTE! Below installation instruction does not work
+
 Download yaml files from:
 ```
 https://github.com/justmeandopensource/kubernetes/tree/master/yamls/nfs-provisioner
