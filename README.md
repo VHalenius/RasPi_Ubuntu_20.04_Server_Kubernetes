@@ -827,3 +827,26 @@ helm install plex k8s-at-home/plex -f values.yaml
 ```
 kubectl expose deploy plex --port 32400 --type LoadBalancer --name plexlb
 ```
+
+## CIFS Flexvolume Plugin for Kubernetes
+
+Run in all nodes (Control plane(s) and nodes)
+```
+VOLUME_PLUGIN_DIR="/usr/libexec/kubernetes/kubelet-plugins/volume/exec"
+```
+
+```
+sudo mkdir -p "$VOLUME_PLUGIN_DIR/fstab~cifs"
+```
+
+```
+cd "$VOLUME_PLUGIN_DIR/fstab~cifs"
+```
+
+```
+sudo curl -L -O https://raw.githubusercontent.com/fstab/cifs/master/cifs
+```
+
+```
+sudo chmod 755 cifs
+```
