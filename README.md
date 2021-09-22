@@ -850,3 +850,14 @@ sudo curl -L -O https://raw.githubusercontent.com/fstab/cifs/master/cifs
 ```
 sudo chmod 755 cifs
 ```
+
+Install packages:
+```
+sudo apt install cifs-utils
+```
+
+```
+sudo apt install jq
+```
+
+```
