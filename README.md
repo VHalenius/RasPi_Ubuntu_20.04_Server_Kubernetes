@@ -16,6 +16,7 @@ Following steps are done in all nodes (control-plane(s) and worker nodes). Steps
 * [Installing pod network](#installing-pod-network)
 * [Join worker nodes](#join-worker-nodes)
 * [Installing local-path Persistent Storage provisioner](#installing-local-path-persistent-storage-provisioner)
+* [Installing NFS client provisioner](#installing-nfs-client-provisioner)
 * [Installing MetalLB load balancer](#installing-metallb-load-balancer)
 * [Installing Helm](#installing-helm)
 
@@ -568,6 +569,93 @@ You should see the following:
 ```
 storageclass.storage.k8s.io/local-path patched
 ```
+## Installing NFS client provisioner
+
+Useful [Youtube video](https://www.youtube.com/watch?v=DF3v2P8ENEg)  from "Just me and Opensource"
+
+```
+sudo apt install rpcbind nfs-kernel-server
+```
+
+```
+sudo mkdir -p /srv/nfs/kubedata
+```
+
+```
+sudo chown nobody: /srv/nfs/kubedata
+```
+
+```
+sudo nano /etc/exports
+```
+
+Add row:
+```
+/srv/nfs/kubedata *(rw,sync,no_root_squash,no_subtree_check,no_all_squash,insecure)
+```
+
+```
+sudo systemctl enable --now nfs-server
+```
+
+```
+sudo exportfs -rav
+```
+
+```
+sudo showmount -e localhost
+```
+
+### Clients (worker nodes)
+
+```
+sudo apt update
+sudo apt-get install rpcbind nfs-common
+```
+
+```
+sudo nano /etc/hosts.deny
+```
+
+Add line:
+```
+rpcbind : ALL
+```
+
+```
+sudo nano /etc/hosts.allow
+```
+
+Add line:
+```
+rpcbind :  YOUR_NFS_SERVER_IP_ADDRESS_HERE
+# In my case
+rpcbind : 192.168.0.230
+```
+
+### Install the NFS client provisioner
+
+Download yaml files from:
+```
+https://github.com/justmeandopensource/kubernetes/tree/master/yamls/nfs-provisioner
+```
+
+Change `deployment.yaml` file, and update NFS server IP address, and change image pointing to arm-version:
+```
+image.repository=quay.io/external_storage/nfs-client-provisioner-arm
+```
+
+```
+kubectl create -f default-sc.yaml
+```
+
+```
+kubectl create -f rbac.yaml
+```
+
+```
+kubectl create -f deployment.yaml
+```
 
 ## Installing MetalLB load balancer
 >NOTE: Control plane only
@@ -678,106 +766,5 @@ sudo apt update
 ```
 sudo apt install helm
 ```
-
-
-## TODO
-
-Install MetalLB – Loadbalancer for bare-metal kubernetes clusters https://metallb.universe.tf/
-
-Install Helm to install kubernetes packages. https://helm.sh/
-
-
-
-
-## NFS (another version)
-
-Useful [Youtube video](https://www.youtube.com/watch?v=DF3v2P8ENEg)  from "Just me and Opensource"
-
-```
-sudo apt install rpcbind nfs-kernel-server
-```
-
-```
-sudo mkdir -p /srv/nfs/kubedata
-```
-
-```
-sudo chown nobody: /srv/nfs/kubedata
-```
-
-```
-sudo nano /etc/exports
-```
-
-Add row:
-```
-/srv/nfs/kubedata *(rw,sync,no_root_squash,no_subtree_check,no_all_squash,insecure)
-```
-
-```
-sudo systemctl enable --now nfs-server
-```
-
-```
-sudo exportfs -rav
-```
-
-```
-sudo showmount -e localhost
-```
-
-### Clients (worker nodes)
-
-```
-sudo apt update
-sudo apt-get install rpcbind nfs-common
-```
-
-```
-sudo nano /etc/hosts.deny
-```
-
-Add line:
-```
-rpcbind : ALL
-```
-
-```
-sudo nano /etc/hosts.allow
-```
-
-Add line:
-```
-rpcbind :  YOUR_NFS_SERVER_IP_ADDRESS_HERE
-# In my case
-rpcbind : 192.168.0.230
-```
-
-### Install the NFS client provisioner
-
-Download yaml files from:
-```
-https://github.com/justmeandopensource/kubernetes/tree/master/yamls/nfs-provisioner
-```
-
-Change `deployment.yaml` file, and update NFS server IP address, and change image pointing to arm-version:
-```
-image.repository=quay.io/external_storage/nfs-client-provisioner-arm
-```
-
-```
-kubectl create -f default-sc.yaml
-```
-
-```
-kubectl create -f rbac.yaml
-```
-
-```
-kubectl create -f deployment.yaml
-```
-
-
-
 
 
