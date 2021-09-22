@@ -777,7 +777,7 @@ sudo mkdir /mnt/
 
 Useful [Youtube video](https://www.youtube.com/watch?v=DF3v2P8ENEg)  from "Just me and Opensource"
 
-``
+```
 sudo mkdir -p /srv/nfs/kubedata
 ```
 
