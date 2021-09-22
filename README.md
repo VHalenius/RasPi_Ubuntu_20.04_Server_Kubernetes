@@ -817,4 +817,13 @@ sudo apt update
 sudo apt install helm
 ```
 
+### Plex Media Server
 
+Use `values.yaml` from this git repo. Change plex claim [token](https://plex.tv/claim)
+```
+helm install plex k8s-at-home/plex -f values.yaml
+```
+
+```
+kubectl expose deploy plex --port 32400 --type LoadBalancer --name plexlb
+```
