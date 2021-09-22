@@ -688,6 +688,77 @@ Install Helm to install kubernetes packages. https://helm.sh/
 
 
 
+## Installing NFS
+
+```
+sudo ufw allow 2049 comment 'NFS'
+```
+
+```
+sudo ufw allow 111 comment 'NFS'
+```
+
+```
+sudo apt install rpcbind nfs-kernel-server
+```
+
+```
+sudo mkdir -p /srv/nfs/storage
+```
+
+```
+sudo chown -R 777 /srv/nfs/storage
+```
+
+```
+sudo nano /etc/exports
+```
+
+Add line:
+```
+/srv/nfs/storage *(rw,sync,no_root_squash,no_subtree_check,no_all_squash,insecure)
+```
+
+Export configuration:
+```
+sudo exportfs -ra
+```
+
+Restart NFS service:
+```
+sudo service nfs-kernel-server restart
+```
+
+### Clients (worker nodes)
+
+```
+sudo apt update
+sudo apt-get install rpcbind nfs-common
+```
+
+```
+sudo nano /etc/hosts.deny
+```
+
+Add line:
+```
+rpcbind : ALL
+```
+
+```
+sudo nano /etc/hosts.allow
+```
+
+Add line:
+```
+rpcbind :  YOUR_NFS_SERVER_IP_ADDRESS_HERE
+```
+### NFS server configuration
+
+```
+sudo systemctl enable nfs-kernel-server
+```
+
 
 
 
