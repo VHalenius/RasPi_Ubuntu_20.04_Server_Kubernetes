@@ -19,7 +19,7 @@ Following steps are done in all nodes (control-plane(s) and worker nodes). Steps
 * [Installing NFS client provisioner](#installing-nfs-client-provisioner)
 * [Installing MetalLB load balancer](#installing-metallb-load-balancer)
 * [Installing Helm](#installing-helm)
-
+* [CIFS Flexvolume Plugin for Kubernetes](#cifs-flexvolume-plugin-for-kubernetes)
 
 ## Changing host name
 
