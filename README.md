@@ -830,6 +830,8 @@ kubectl expose deploy plex --port 32400 --type LoadBalancer --name plexlb
 
 ## CIFS Flexvolume Plugin for Kubernetes
 
+More information can be found in [sdtab Git page](https://github.com/fstab/cifs)
+
 Run in all nodes (Control plane(s) and nodes)
 ```
 VOLUME_PLUGIN_DIR="/usr/libexec/kubernetes/kubelet-plugins/volume/exec"
@@ -860,4 +862,76 @@ sudo apt install cifs-utils
 sudo apt install jq
 ```
 
+Test if plugin works:
 ```
+VOLUME_PLUGIN_DIR="/usr/libexec/kubernetes/kubelet-plugins/volume/exec"
+```
+
+```
+$VOLUME_PLUGIN_DIR/fstab~cifs/cifs init
+```
+
+The plugin takes the CIFS username and password from a Kubernetes Secret. To create the secret, you first have to convert your username and password to base64 encoding:
+```
+echo -n username | base64
+```
+
+```
+echo -n password | base64
+```
+
+
+Then, create a file `secret.yaml` and use the ouput of the above commands as username and password:
+```
+apiVersion: v1
+kind: Secret
+metadata:
+  name: cifs-secret
+  namespace: default
+type: fstab/cifs
+data:
+  username: 'ZXhhbXBsZQ=='
+  password: 'bXktc2VjcmV0LXBhc3N3b3Jk'
+```
+
+Apply the secret:
+```
+kubectl apply -f secret.yaml
+```
+
+### Usage
+```
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nas-pv
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 10Gi
+  accessModes: 
+    - ReadWriteOnce
+  flexVolume:
+    driver: "fstab/cifs"
+    fsType: "cifs"
+    secretRef:
+      name: "cifs-secret"
+    options:
+      networkPath: "//192.168.0.201/Multimedia"
+      mountOptions: "dir_mode=0755,file_mode=0644,noperm"
+    readOnly: true
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: nas-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+---
+```
+
