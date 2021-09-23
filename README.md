@@ -900,6 +900,8 @@ kubectl apply -f secret.yaml
 ```
 
 ### Usage
+
+Use `spec.flexVolume.options.networkPath` to specify the network cifs share. For PersistentVolumeClaim to bind, one must use the same `spec.storageClassName`, `spec.accessModes` and storage sizes in both PersistentVolume and PersistentVolumeClaim:
 ```
 apiVersion: v1
 kind: PersistentVolume
