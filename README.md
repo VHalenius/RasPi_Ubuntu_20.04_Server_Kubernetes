@@ -20,7 +20,7 @@ Following steps are done in all nodes (control-plane(s) and worker nodes). Steps
 * [Installing MetalLB load balancer](#installing-metallb-load-balancer)
 * [Installing Helm](#installing-helm)
 * [CIFS Flexvolume Plugin for Kubernetes](#cifs-flexvolume-plugin-for-kubernetes)
-* [Plex Media Server](#plex-media-server)
+* [Plex Media Server using media from NAS server](#plex-media-server-using-media-from-nas-server)
 
 ## Changing host name
 
@@ -934,7 +934,7 @@ spec:
 ---
 ```
 
-## Plex Media Server
+## Plex Media Server using media from NAS server
 
 Use `values.yaml` from this git repo. Change plex claim [token](https://plex.tv/claim). For example, image was changed to `ghcr.io/linuxserver/plex`, arm64, persistence was changed etc.
 
