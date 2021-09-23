@@ -936,7 +936,7 @@ spec:
 
 ## Plex Media Server using media from NAS server
 
-Use `values.yaml` from this git repo. Change plex claim [token](https://plex.tv/claim). For example, image was changed to `ghcr.io/linuxserver/plex`, arm64, persistence was changed etc.
+Use `values.yaml` from this git repo. Change plex claim [token](https://plex.tv/claim). Changes include for example: image was changed to `ghcr.io/linuxserver/plex`, arm64 from `https://docs.linuxserver.io/images/docker-plex`, persistence was changed etc.
 
 ```
 helm install plex k8s-at-home/plex -f values.yaml
