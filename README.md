@@ -936,10 +936,116 @@ spec:
 
 ## Plex Media Server using media from NAS server
 
-Use `values.yaml` from this git repo. Change plex claim [token](https://plex.tv/claim). Changes include for example: image was changed to `ghcr.io/linuxserver/plex`, arm64 from `https://docs.linuxserver.io/images/docker-plex`, persistence was changed etc.
+Plex Media server can be installed with Helm chart made by [k8s-at-home](https://artifacthub.io/packages/helm/k8s-at-home/plex). I have made some changes to the configuration to be able to run it with Raspberry Pi and with media files read from separate NAS server. For NAS server access I used [CIFS Flexvolume Plugin for Kubernetes](https://github.com/fstab/cifs).
 
+On of the changes I made in the [values.yaml](./values.yaml) file is to use different image. I'm using one from [linuxsercer.io](https://docs.linuxserver.io/images/docker-plex):
+```
+  # -- image repository
+  #repository: ghcr.io/k8s-at-home/plex
+  repository: ghcr.io/linuxserver/plex
+  # -- image tag
+  #tag: v1.24.1.4931-1a38e63c6
+  tag: arm64v8-latest
+```
+I also changed time zone to Europe/Helsinki, and added `env.PLEX_CLAIM` value from [plex.tv/claim](https://www.plex.tv/claim/). I also made some changes to `persistence`:
+```
+persistence:
+  config:
+    enabled: true
+    mountPath: /config
+    accessMode: "ReadWriteMany"
+    size: 5Gi
+  data:
+    enabled: true
+    mountPath: /data2
+    accessMode: "ReadWriteMany"
+    size: 5Gi
+```
+
+After the changes I installed Helm chart:
 ```
 helm install plex k8s-at-home/plex -f values.yaml
 ```
 
-Once deployed, deployment needs to be patched to include PersistentStorage and PersistentStorageClaim to support mapping media from NAS server share (reqires CIFS Flexvolume Plugin for Kubernetes)
+Next step was to make PersistentVolume and PersistentVolumeClaim for NAS server share. This was done using [plex-pv.yaml](./plex-pv.yaml) file:
+```
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: nas-pv
+spec:
+  storageClassName: manual
+  capacity:
+    storage: 10Gi
+  accessModes: 
+    - ReadWriteOnce
+  flexVolume:
+    driver: "fstab/cifs"
+    fsType: "cifs"
+    secretRef:
+      name: "cifs-secret"
+    options:
+      networkPath: "//192.168.0.201/Multimedia"
+      mountOptions: "dir_mode=0755,file_mode=0644,noperm"
+    readOnly: true
+---
+kind: PersistentVolumeClaim
+apiVersion: v1
+metadata:
+  name: nas-claim
+spec:
+  storageClassName: manual
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 10Gi
+```
+
+These were then created by running:
+```
+kubectl apply -f plex-pv.yaml
+```
+
+Next step was to make a a patch file [patch-file.yaml](./patch-file.yaml) to patch the deployment:
+```
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: plex
+        app.kubernetes.io/name: plex
+    spec:
+      containers:
+      - env:
+        name: plex
+        volumeMounts:
+        - mountPath: /config
+          name: config
+        - mountPath: /data2
+          name: data
+        - mountPath: /nas
+          name: nas-pv
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: plex-config
+      - name: data
+        persistentVolumeClaim:
+          claimName: plex-data
+      - name: nas-pv
+        persistentVolumeClaim:
+          claimName: nas-claim 
+```
+
+This was applied by running:
+```
+kubectl patch deployment plex --patch "$(cat patch-file.yaml)"
+```
+
+Finally I created a Load Balancer service for the deployment, so that I can access the application using IP address from my subnet:
+```
+kubectl expose deploy plex --port 32400 --type LoadBalancer --name plexlb
+```
+
+That's it. Plex media server can now see my NAS, and I can use it to add libraries.
