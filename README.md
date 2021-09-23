@@ -20,6 +20,7 @@ Following steps are done in all nodes (control-plane(s) and worker nodes). Steps
 * [Installing MetalLB load balancer](#installing-metallb-load-balancer)
 * [Installing Helm](#installing-helm)
 * [CIFS Flexvolume Plugin for Kubernetes](#cifs-flexvolume-plugin-for-kubernetes)
+* [Plex Media Server](#plex-media-server)
 
 ## Changing host name
 
@@ -817,12 +818,8 @@ sudo apt update
 sudo apt install helm
 ```
 
-## Plex Media Server
 
-Use `values.yaml` from this git repo. Change plex claim [token](https://plex.tv/claim)
-```
-helm install plex k8s-at-home/plex -f values.yaml
-```
+
 
 ```
 kubectl expose deploy plex --port 32400 --type LoadBalancer --name plexlb
@@ -937,3 +934,12 @@ spec:
 ---
 ```
 
+## Plex Media Server
+
+Use `values.yaml` from this git repo. Change plex claim [token](https://plex.tv/claim). For example, image was changed to `ghcr.io/linuxserver/plex`, arm64, persistence was changed etc.
+
+```
+helm install plex k8s-at-home/plex -f values.yaml
+```
+
+Once deployed, deployment needs to be patched to include PersistentStorage and PersistentStorageClaim to support mapping media from NAS server share (reqires CIFS Flexvolume Plugin for Kubernetes)
