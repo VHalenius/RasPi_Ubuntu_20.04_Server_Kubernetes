@@ -24,7 +24,7 @@ env:
   TZ: Europe/Helsinki
   # ADVERTISE_IP:
   ALLOWED_NETWORKS: 192.168.0.0/255.255.255.0,10.0.0.0/255.0.0.0
-  PLEX_CLAIM: claim-aNTDwUASjjsudGQcQG52
+  PLEX_CLAIM: claim-d1FiTaKas-Z3qTESBaTd
   # PLEX_PREFERENCE_1: "FriendlyName=plex-kubernetes"
   # PLEX_PREFERENCE_2: "EnableIPv6=0"
   # PLEX_PREFERENCE_3: "logDebug=0"
@@ -79,17 +79,17 @@ persistence:
     enabled: true
     mountPath: /config
     accessMode: "ReadWriteMany"
-    size: 1Gi
+    size: 5Gi
   data:
     enabled: true
-    mountPath: /data
+    mountPath: /data2
     accessMode: "ReadWriteMany"
-    size: 1Gi
+    size: 5Gi
   transcode:
     enabled: true
     mountPath: /transcode
     accessMode: "ReadWriteMany"
-    size: 1Gi
+    size: 5Gi
 
   transcode:
     enabled: false

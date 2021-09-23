@@ -1,0 +1,28 @@
+spec:
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/instance: plex
+        app.kubernetes.io/name: plex
+    spec:
+      containers:
+      - env:
+        name: plex
+        volumeMounts:
+        - mountPath: /config
+          name: config
+        - mountPath: /data2
+          name: data
+        - mountPath: /nas
+          name: nas-pv
+      volumes:
+      - name: config
+        persistentVolumeClaim:
+          claimName: plex-config
+      - name: data
+        persistentVolumeClaim:
+          claimName: plex-data
+      - name: nas-pv
+        persistentVolumeClaim:
+          claimName: nas-claim 
+
