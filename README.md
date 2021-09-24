@@ -818,13 +818,6 @@ sudo apt update
 sudo apt install helm
 ```
 
-
-
-
-```
-kubectl expose deploy plex --port 32400 --type LoadBalancer --name plexlb
-```
-
 ## CIFS Flexvolume Plugin for Kubernetes
 
 More information can be found in [fstab Git page](https://github.com/fstab/cifs)
